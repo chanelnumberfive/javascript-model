@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+</head>
+<body>
+<button id="changxiasheng">subscribe</button>
+<button id="zhangxiaohui">subscribe</button>
+<button id="liyanan">publisher</button>
+<script src="jquery-1.12.3.min.js"></script>
+<script>
+//完全可以用jquery的事件模式替代该插件
+//该组件并没有引用dom的事件机制，并不完美适合dom
+var pubSub={};
++function(q){
+	var topics={},
+		subUid=-1;
+	
+	//发布事件
+	q.publish=function(topic,args){
+		if(!topics[topic]) {
+			return false;
+		}
+		var subscribers=topics[topic],
+			len=subscribers?subscribers.length:0;
+		while(len--){
+			subscribers[len].func(topic,args);
+		}
+		return this;
+	}
+	
+	//订阅事件
+	q.subscribe=function(topic,func){
+		if(!topics[topic]){
+			topics[topic]=[];
+		}
+		var token=(++subUid).toString();
+		topics[topic].push({
+			token:token,
+			func:func
+		});
+		return token;
+	}
+	
+	//取消订阅事件
+	q.unsubscribe=function(token){
+		for(var m in topics){
+			if(topics[m]){
+				for(var i=0,j=topics[m].length;i<j;i++){
+					if(topics[m][i].token===token){
+						topics[m].splice(i,1);
+						return token;
+					}
+				}
+			}
+		}
+		return this;
+	}
+}(pubSub);
+</script>
+</body>
+</html>
